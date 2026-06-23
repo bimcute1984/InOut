@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  OWNER
+  MANAGER
+  EMPLOYEE
+}
+
+enum AttendanceStatus {
+  CHECKED_IN
+  CHECKED_OUT
+  LATE
+  ABSENT
+}
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branches  Branch[]
+  users     User[]
+  employees Employee[]
+}
+
+model Branch {
+  id          String   @id @default(uuid())
+  companyId   String
+  name        String
+  address     String?
+  latitude    Float?
+  longitude   Float?
+  radiusMeter Int      @default(100)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company    Company @relation(fields: [companyId], references: [id])
+  employees  Employee[]
+  attendance AttendanceLog[]
+}
+
+model User {
+  id           String   @id @default(uuid())
+  companyId    String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(OWNER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+}
+
+model Employee {
+  id        String   @id @default(uuid())
+  companyId String
+  branchId  String?
+  code      String?
+  firstName String
+  lastName  String
+  phone     String?
+  position  String?
+  pin       String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company    Company @relation(fields: [companyId], references: [id])
+  branch     Branch? @relation(fields: [branchId], references: [id])
+  attendance AttendanceLog[]
+
+  @@index([companyId])
+  @@index([branchId])
+}
+
+model AttendanceLog {
+  id          String           @id @default(uuid())
+  companyId   String
+  branchId    String?
+  employeeId  String
+  status      AttendanceStatus
+  checkInAt   DateTime?
+  checkOutAt  DateTime?
+  latitude    Float?
+  longitude   Float?
+  distanceM   Float?
+  selfieUrl   String?
+  note        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+  branch   Branch?  @relation(fields: [branchId], references: [id])
+
+  @@index([companyId, createdAt])
+  @@index([employeeId, createdAt])
+}
