@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { CompaniesModule } from './companies/companies.module';
 import { EmployeesModule } from './employees/employees.module';
 import { AttendanceModule } from './attendance/attendance.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AttendanceModule } from './attendance/attendance.module';
     CompaniesModule,
     EmployeesModule,
     AttendanceModule,
+    DashboardModule,
   ],
   providers: [PrismaService],
 })

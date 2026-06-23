@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PrismaService } from '../common/prisma.service';
-import { AttendanceController } from './attendance.controller';
-import { AttendanceService } from './attendance.service';
+import { DashboardController } from './dashboard.controller';
+import { DashboardService } from './dashboard.service';
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { AttendanceService } from './attendance.service';
       }),
     }),
   ],
-  controllers: [AttendanceController],
-  providers: [AttendanceService, PrismaService, JwtAuthGuard],
+  controllers: [DashboardController],
+  providers: [DashboardService, PrismaService, JwtAuthGuard],
 })
-export class AttendanceModule {}
+export class DashboardModule {}
