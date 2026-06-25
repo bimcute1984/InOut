@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="gn" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="bl" x1="0.7" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+  </defs>
+  <!-- Green figure -->
+  <circle cx="30" cy="8" r="7" fill="url(#gn)"/>
+  <path d="M30 15 C6 28,4 72,40 84" stroke="url(#gn)" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M40 84 L24 80 L30 68" stroke="url(#gn)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Blue figure -->
+  <circle cx="70" cy="8" r="7" fill="url(#bl)"/>
+  <path d="M70 15 C94 28,96 72,60 84" stroke="url(#bl)" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M60 84 L76 80 L70 68" stroke="url(#bl)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Clock face -->
+  <circle cx="50" cy="46" r="26" fill="white"/>
+  <!-- Tick marks -->
+  <line x1="50" y1="24" x2="50" y2="28" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+  <line x1="50" y1="64" x2="50" y2="68" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+  <line x1="28" y1="46" x2="32" y2="46" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+  <line x1="68" y1="46" x2="72" y2="46" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+  <line x1="39" y1="27" x2="41" y2="29" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="61" y1="27" x2="59" y2="29" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="30" y1="36" x2="32" y2="37" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="70" y1="36" x2="68" y2="37" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="30" y1="56" x2="32" y2="55" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="70" y1="56" x2="68" y2="55" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="39" y1="65" x2="41" y2="63" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="61" y1="65" x2="59" y2="63" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Clock hands -->
+  <line x1="50" y1="46" x2="50" y2="30" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/>
+  <line x1="50" y1="46" x2="63" y2="40" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="50" cy="46" r="2.5" fill="#0f172a"/>
+</svg>

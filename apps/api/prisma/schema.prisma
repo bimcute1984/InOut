@@ -20,17 +20,34 @@ enum AttendanceStatus {
   ABSENT
 }
 
+enum PlanType {
+  FREE
+  STARTER
+  BUSINESS
+  PRO
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model Company {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  phone     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  plan         PlanType @default(FREE)
+  trialEndsAt  DateTime?
+  qrToken      String?  @unique @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   branches  Branch[]
   users     User[]
   employees Employee[]
+  schedules Schedule[]
 }
 
 model Branch {
@@ -78,6 +95,7 @@ model Employee {
   company    Company @relation(fields: [companyId], references: [id])
   branch     Branch? @relation(fields: [branchId], references: [id])
   attendance AttendanceLog[]
+  leaves     Leave[]
 
   @@index([companyId])
   @@index([branchId])
@@ -104,4 +122,38 @@ model AttendanceLog {
 
   @@index([companyId, createdAt])
   @@index([employeeId, createdAt])
+}
+
+model Schedule {
+  id          String   @id @default(uuid())
+  companyId   String
+  name        String
+  startTime   String
+  endTime     String
+  daysOfWeek  Int[]
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+}
+
+model Leave {
+  id         String      @id @default(uuid())
+  companyId  String
+  employeeId String
+  type       String
+  startDate  DateTime
+  endDate    DateTime
+  reason     String?
+  status     LeaveStatus @default(PENDING)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  @@index([companyId])
+  @@index([employeeId])
 }

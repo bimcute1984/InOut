@@ -15,13 +15,16 @@
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
-            "assets": [],
+            "assets": [{"glob": "favicon.svg", "input": "src", "output": "/"}],
             "styles": ["src/styles.css"]
           }
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": { "buildTarget": "web:build" }
+          "options": {
+            "buildTarget": "web:build",
+            "proxyConfig": "proxy.conf.json"
+          }
         }
       }
     }

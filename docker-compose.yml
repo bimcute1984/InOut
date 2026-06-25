@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: worksphere-postgres
+    container_name: inout-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: worksphere
@@ -10,6 +10,30 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - worksphere_pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build: ./apps/api
+    container_name: inout-api
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://worksphere:worksphere_pass@postgres:5432/inout?schema=public
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      JWT_EXPIRES_IN: 1d
+      API_PORT: 3000
+    ports:
+      - "3000:3000"
+
+  web:
+    build: ./apps/web
+    container_name: inout-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+
 volumes:
-  worksphere_pgdata:
+  pgdata:
