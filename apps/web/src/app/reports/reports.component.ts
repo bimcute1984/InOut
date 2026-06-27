@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 import { I18nService } from '../core/i18n.service';
+import * as XLSX from 'xlsx';
 
 interface DailyReport {
   date: string;
@@ -41,8 +42,16 @@ interface MonthlyReport {
     <header>
       <h1>{{ i18n.t('rpt.title') }}</h1>
       <div class="export-btns">
+        <button class="btn-excel" (click)="exportExcel()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Excel
+        </button>
         <button class="btn-csv" (click)="exportCsv()">{{ i18n.t('rpt.export_csv') }}</button>
         <button class="btn-pdf" (click)="exportPdf()">{{ i18n.t('rpt.export_pdf') }}</button>
+        <button class="btn-print" (click)="printReport()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print
+        </button>
       </div>
     </header>
 
@@ -147,15 +156,20 @@ interface MonthlyReport {
     :host { display: block; }
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     h1 { margin: 0; font-size: 24px; color: #0f172a; }
-    .export-btns { display: flex; gap: 8px; }
-    .btn-csv, .btn-pdf {
-      padding: 9px 18px; border-radius: 10px; font-size: 13px;
+    .export-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-excel, .btn-csv, .btn-pdf, .btn-print {
+      padding: 9px 16px; border-radius: 10px; font-size: 13px;
       font-weight: 600; cursor: pointer; border: none;
+      display: inline-flex; align-items: center; gap: 6px;
     }
+    .btn-excel { background: #ecfdf5; color: #059669; }
+    .btn-excel:hover { background: #d1fae5; }
     .btn-csv { background: #eef2ff; color: #4f46e5; }
-    .btn-csv:hover { background: #d1fae5; }
+    .btn-csv:hover { background: #e0e7ff; }
     .btn-pdf { background: #fef2f2; color: #dc2626; }
     .btn-pdf:hover { background: #fee2e2; }
+    .btn-print { background: #f1f5f9; color: #475569; }
+    .btn-print:hover { background: #e2e8f0; }
     .tabs {
       display: flex; gap: 4px; background: white; border-radius: 12px;
       padding: 4px; margin-bottom: 20px; width: fit-content;
@@ -251,6 +265,39 @@ export class ReportsComponent implements OnInit {
     this.http
       .get<MonthlyReport>(`/api/reports/monthly?year=${y}&month=${m}`)
       .subscribe((d) => this.monthly.set(d));
+  }
+
+  exportExcel() {
+    let data: any[][] = [];
+    if (this.tab() === 'daily' && this.daily()) {
+      const d = this.daily()!;
+      data = [
+        ['Employee', 'Check In', 'Check Out', 'Status'],
+        ...d.logs.map((l) => [
+          `${l.employee.firstName} ${l.employee.lastName}`,
+          l.checkInAt ? new Date(l.checkInAt).toLocaleTimeString() : '',
+          l.checkOutAt ? new Date(l.checkOutAt).toLocaleTimeString() : '',
+          l.status,
+        ]),
+      ];
+    } else if (this.tab() === 'monthly' && this.monthly()) {
+      const m = this.monthly()!;
+      data = [
+        ['Employee', 'Days Worked', 'Total Hours'],
+        ...m.employeeSummary.map((e) => [e.name, e.days, e.totalHours]),
+      ];
+    }
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Report');
+    const filename = this.tab() === 'daily'
+      ? `report-${this.selectedDate}.xlsx`
+      : `report-${this.selectedMonth}.xlsx`;
+    XLSX.writeFile(wb, filename);
+  }
+
+  printReport() {
+    window.print();
   }
 
   exportCsv() {

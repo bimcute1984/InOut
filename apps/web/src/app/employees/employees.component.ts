@@ -9,6 +9,7 @@ interface Employee {
   lastName: string;
   phone?: string;
   position?: string;
+  avatarUrl?: string;
   isActive: boolean;
   createdAt: string;
 }
@@ -55,7 +56,16 @@ interface Employee {
           <tbody>
             @for (emp of filtered(); track emp.id) {
               <tr>
-                <td class="name">{{ emp.firstName }}</td>
+                <td>
+                  <div class="emp-cell">
+                    @if (emp.avatarUrl) {
+                      <img [src]="emp.avatarUrl" class="avatar" />
+                    } @else {
+                      <div class="avatar-placeholder">{{ emp.firstName[0] }}</div>
+                    }
+                    <span class="name">{{ emp.firstName }}</span>
+                  </div>
+                </td>
                 <td class="name">{{ emp.lastName }}</td>
                 <td>{{ emp.position || '—' }}</td>
                 <td>{{ emp.phone || '—' }}</td>
@@ -64,7 +74,14 @@ interface Employee {
                     {{ emp.isActive ? i18n.t('emp.active') : i18n.t('emp.inactive') }}
                   </span>
                 </td>
-                <td><button class="btn-edit" (click)="openEdit(emp)">{{ i18n.t('emp.edit') }}</button></td>
+                <td>
+                  <div class="action-btns">
+                    <button class="btn-edit" (click)="openEdit(emp)">{{ i18n.t('emp.edit') }}</button>
+                    <button class="btn-del" (click)="onDelete(emp)">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                  </div>
+                </td>
               </tr>
             }
           </tbody>
@@ -77,6 +94,17 @@ interface Employee {
         <div class="dialog" (click)="$event.stopPropagation()">
           <h2>{{ editingId ? i18n.t('emp.edit_title') : i18n.t('emp.add_title') }}</h2>
           <form (ngSubmit)="onSave()" class="form">
+            <div class="photo-upload" (click)="fileInput.click()">
+              @if (form.avatarUrl) {
+                <img [src]="form.avatarUrl" class="photo-preview" />
+              } @else {
+                <div class="photo-empty">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  <span>Add Photo</span>
+                </div>
+              }
+              <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+            </div>
             <label>{{ i18n.t('emp.first_name') }}
               <input [(ngModel)]="form.firstName" name="firstName" required />
             </label>
@@ -134,7 +162,14 @@ interface Employee {
       letter-spacing: 0.5px; border-bottom: 1px solid #f1f5f9;
     }
     td { padding: 14px 20px; font-size: 14px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+    .emp-cell { display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+    .avatar-placeholder { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#8b5cf6); color: white; display: grid; place-items: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
     .name { font-weight: 600; color: #0f172a; }
+    .photo-upload { cursor: pointer; display: flex; justify-content: center; margin-bottom: 4px; }
+    .photo-preview { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #eef2ff; }
+    .photo-empty { width: 80px; height: 80px; border-radius: 50%; background: #f5f3ff; border: 2px dashed #c7d2fe; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #6366f1; gap: 2px; }
+    .photo-empty span { font-size: 10px; font-weight: 600; }
     .badge {
       padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
     }
@@ -145,6 +180,9 @@ interface Employee {
       padding: 6px 14px; font-size: 13px; color: #475569; cursor: pointer;
     }
     .btn-edit:hover { background: #f8fafc; }
+    .action-btns { display: flex; gap: 6px; }
+    .btn-del { background: none; border: 1px solid #fecaca; border-radius: 8px; padding: 6px 8px; color: #ef4444; cursor: pointer; display: grid; place-items: center; }
+    .btn-del:hover { background: #fef2f2; }
     .overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.4);
       display: grid; place-items: center; z-index: 100;
@@ -198,7 +236,7 @@ export class EmployeesComponent implements OnInit {
   showDialog = signal(false);
   saving = signal(false);
   editingId = '';
-  form = { firstName: '', lastName: '', position: '', phone: '' };
+  form = { firstName: '', lastName: '', position: '', phone: '', avatarUrl: '' };
 
   filtered = computed(() => {
     const q = this.search.toLowerCase();
@@ -228,7 +266,7 @@ export class EmployeesComponent implements OnInit {
 
   openAdd() {
     this.editingId = '';
-    this.form = { firstName: '', lastName: '', position: '', phone: '' };
+    this.form = { firstName: '', lastName: '', position: '', phone: '', avatarUrl: '' };
     this.showDialog.set(true);
   }
 
@@ -239,12 +277,26 @@ export class EmployeesComponent implements OnInit {
       lastName: emp.lastName,
       position: emp.position ?? '',
       phone: emp.phone ?? '',
+      avatarUrl: emp.avatarUrl ?? '',
     };
     this.showDialog.set(true);
   }
 
+  onFileSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => { this.form.avatarUrl = reader.result as string; };
+    reader.readAsDataURL(file);
+  }
+
   closeDialog() {
     this.showDialog.set(false);
+  }
+
+  onDelete(emp: Employee) {
+    if (!confirm(`${emp.firstName} ${emp.lastName} — Delete?`)) return;
+    this.http.patch(`/api/employees/${emp.id}`, { isActive: false }).subscribe(() => this.load());
   }
 
   onSave() {

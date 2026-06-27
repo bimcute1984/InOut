@@ -87,6 +87,7 @@ model Employee {
   lastName  String
   phone     String?
   position  String?
+  avatarUrl String?
   pin       String?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())

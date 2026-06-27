@@ -29,6 +29,10 @@ class CreateEmployeeDto {
 
   @IsOptional()
   @IsString()
+  avatarUrl?: string;
+
+  @IsOptional()
+  @IsString()
   pin?: string;
 }
 
@@ -56,6 +60,10 @@ class UpdateEmployeeDto {
   @IsOptional()
   @IsString()
   position?: string;
+
+  @IsOptional()
+  @IsString()
+  avatarUrl?: string;
 
   @IsOptional()
   @IsBoolean()

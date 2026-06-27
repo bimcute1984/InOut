@@ -15,7 +15,7 @@ interface DashboardData {
     status: string;
     checkInAt: string | null;
     checkOutAt: string | null;
-    employee: { firstName: string; lastName: string };
+    employee: { firstName: string; lastName: string; avatarUrl?: string };
   }[];
 }
 
@@ -81,7 +81,11 @@ interface DashboardData {
         } @else {
           @for (log of data().recentLogs; track log.id) {
             <div class="activity-row">
-              <div class="activity-avatar">{{ log.employee.firstName[0] }}</div>
+              @if (log.employee.avatarUrl) {
+                <img [src]="log.employee.avatarUrl" class="activity-avatar-img" />
+              } @else {
+                <div class="activity-avatar">{{ log.employee.firstName[0] }}</div>
+              }
               <div class="activity-info">
                 <strong>{{ log.employee.firstName }} {{ log.employee.lastName }}</strong>
                 <span class="activity-type" [class.checkin]="log.status === 'CHECKED_IN'" [class.checkout]="log.status === 'CHECKED_OUT'">
@@ -135,12 +139,15 @@ interface DashboardData {
       padding: 12px 0; border-bottom: 1px solid #f1f5f9;
     }
     .activity-row:last-child { border-bottom: none; }
+    .activity-avatar, .activity-avatar-img {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    }
     .activity-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
       background: linear-gradient(135deg, #6366f1, #8b5cf6);
       color: white; display: grid; place-items: center;
       font-weight: 700; font-size: 14px;
     }
+    .activity-avatar-img { object-fit: cover; }
     .activity-info { flex: 1; }
     .activity-info strong { display: block; font-size: 14px; color: #0f172a; }
     .activity-type { font-size: 12px; }

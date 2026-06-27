@@ -2,6 +2,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { I18nService } from '../core/i18n.service';
 
 interface CompanyInfo {
@@ -12,7 +13,7 @@ interface CompanyInfo {
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [FormsModule, DatePipe],
+  imports: [FormsModule, DatePipe, RouterLink],
   template: `
     <header><h1>{{ i18n.t('set.title') }}</h1></header>
 
@@ -42,11 +43,11 @@ interface CompanyInfo {
       <div class="card">
         <h2>{{ i18n.t('nav.leave') }} & {{ i18n.t('nav.billing') }}</h2>
         <div class="link-grid">
-          <a class="link-card" href="/leave">
+          <a class="link-card" routerLink="/leave">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             {{ i18n.t('leave.title') }}
           </a>
-          <a class="link-card" href="/billing">
+          <a class="link-card" routerLink="/billing">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
             {{ i18n.t('bill.title') }}
           </a>

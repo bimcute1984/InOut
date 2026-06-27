@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 
-interface Employee { id: string; firstName: string; lastName: string; position?: string; }
+interface Employee { id: string; firstName: string; lastName: string; position?: string; avatarUrl?: string; }
 interface Status { checkedIn: boolean; attendanceId: string | null; checkInAt: string | null; }
 
 @Component({
@@ -57,7 +57,11 @@ interface Status { checkedIn: boolean; attendanceId: string | null; checkInAt: s
         <div class="emp-list">
           @for (emp of employees(); track emp.id) {
             <button class="emp-btn" [disabled]="loading()" (click)="selectEmployee(emp)">
-              <div class="emp-avatar">{{ emp.firstName[0] }}</div>
+              @if (emp.avatarUrl) {
+                <img [src]="emp.avatarUrl" class="emp-avatar-img" />
+              } @else {
+                <div class="emp-avatar">{{ emp.firstName[0] }}</div>
+              }
               <div class="emp-info">
                 <strong>{{ emp.firstName }} {{ emp.lastName }}</strong>
                 @if (emp.position) { <span>{{ emp.position }}</span> }
@@ -128,11 +132,14 @@ interface Status { checkedIn: boolean; attendanceId: string | null; checkInAt: s
     }
     .emp-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); }
     .emp-btn:disabled { opacity: 0.5; }
-    .emp-avatar {
-      width: 40px; height: 40px; border-radius: 12px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      display: grid; place-items: center; font-weight: 700; font-size: 16px; flex-shrink: 0;
+    .emp-avatar, .emp-avatar-img {
+      width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
     }
+    .emp-avatar {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: grid; place-items: center; font-weight: 700; font-size: 16px;
+    }
+    .emp-avatar-img { object-fit: cover; }
     .emp-info { flex: 1; }
     .emp-info strong { display: block; font-size: 15px; }
     .emp-info span { font-size: 12px; color: #94a3b8; }

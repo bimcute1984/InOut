@@ -21,6 +21,11 @@ export const routes: Routes = [
       import('./auth/register.component').then((m) => m.RegisterComponent),
   },
   {
+    path: 'scan',
+    loadComponent: () =>
+      import('./scan/scan.component').then((m) => m.ScanComponent),
+  },
+  {
     path: 'kiosk/:token',
     loadComponent: () =>
       import('./kiosk/kiosk.component').then((m) => m.KioskComponent),
@@ -96,5 +101,10 @@ export const routes: Routes = [
       return inject(Router).createUrlTree(['/home']);
     }],
     children: [],
+  },
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./not-found/not-found.component').then((m) => m.NotFoundComponent),
   },
 ];

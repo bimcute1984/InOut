@@ -8,7 +8,8 @@ async function bootstrap() {
   app.enableCors({ origin: true, credentials: true });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  const config = app.get(ConfigService);
-  await app.listen(config.get<number>('API_PORT') ?? 3000);
+  const port = process.env['PORT'] ?? process.env['API_PORT'] ?? 3000;
+  await app.listen(port, '0.0.0.0');
+  console.log(`API running on port ${port}`);
 }
 bootstrap();
