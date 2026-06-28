@@ -8,32 +8,42 @@ export class AuthService {
   constructor(private readonly prisma: PrismaService, private readonly jwt: JwtService) {}
 
   async register(dto: { companyName: string; email: string; password: string }) {
-    const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
-    if (existing) throw new BadRequestException('Email already exists');
+    try {
+      const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
+      if (existing) throw new BadRequestException('Email already exists');
 
-    const passwordHash = await bcrypt.hash(dto.password, 10);
-    const company = await this.prisma.company.create({
-      data: {
-        name: dto.companyName,
-        email: dto.email,
-        users: { create: { email: dto.email, passwordHash, role: 'OWNER' } },
-        branches: { create: { name: 'Main Branch' } },
-      },
-      include: { users: true, branches: true },
-    });
+      const passwordHash = await bcrypt.hash(dto.password, 10);
+      const company = await this.prisma.company.create({
+        data: {
+          name: dto.companyName,
+          email: dto.email,
+          users: { create: { email: dto.email, passwordHash, role: 'OWNER' } },
+          branches: { create: { name: 'Main Branch' } },
+        },
+        include: { users: true, branches: true },
+      });
 
-    const user = company.users[0];
-    return this.issueToken(user.id, company.id, user.email, user.role);
+      const user = company.users[0];
+      return this.issueToken(user.id, company.id, user.email, user.role);
+    } catch (e: any) {
+      console.error('REGISTER ERROR:', e.message);
+      throw e;
+    }
   }
 
   async login(email: string, password: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) throw new UnauthorizedException('Invalid email or password');
+    try {
+      const user = await this.prisma.user.findUnique({ where: { email } });
+      if (!user) throw new UnauthorizedException('Invalid email or password');
 
-    const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) throw new UnauthorizedException('Invalid email or password');
+      const ok = await bcrypt.compare(password, user.passwordHash);
+      if (!ok) throw new UnauthorizedException('Invalid email or password');
 
-    return this.issueToken(user.id, user.companyId, user.email, user.role);
+      return this.issueToken(user.id, user.companyId, user.email, user.role);
+    } catch (e: any) {
+      console.error('LOGIN ERROR:', e.message);
+      throw e;
+    }
   }
 
   private issueToken(userId: string, companyId: string, email: string, role: string) {
