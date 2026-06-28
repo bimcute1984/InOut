@@ -285,9 +285,20 @@ export class EmployeesComponent implements OnInit {
   onFileSelected(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => { this.form.avatarUrl = reader.result as string; };
-    reader.readAsDataURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const size = 128;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d')!;
+      const min = Math.min(img.width, img.height);
+      const sx = (img.width - min) / 2;
+      const sy = (img.height - min) / 2;
+      ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+      this.form.avatarUrl = canvas.toDataURL('image/jpeg', 0.7);
+    };
+    img.src = URL.createObjectURL(file);
   }
 
   closeDialog() {
